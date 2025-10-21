@@ -19,10 +19,16 @@
   "homepage": "https://github.com/SprintFlow/SprintFlow-Server#readme",
   "description": "",
   "dependencies": {
-    "express": "^5.1.0"
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongoose": "^8.19.2",
+    "sequelize": "^6.37.7"
   },
   "devDependencies": {
+    "jest": "^30.2.0",
     "nodemon": "^3.1.10",
+    "supertest": "^7.1.4",
     "typescript": "^5.9.3"
   }
 }
