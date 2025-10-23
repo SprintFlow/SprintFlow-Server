@@ -1,11 +1,18 @@
-// --- 1. Dependencies ---
+// Dependencies
 const express = require('express');
-const { registerUser, loginUser } = require('../controllers/userController.js');
+const {
+    registerUser,
+    loginUser,
+    getAllUsers,
+    getUserById,
+    updateUserRole,
+    deleteUser
+} = require('../controllers/userController.js');
 
-// --- 2. Router Definition ---
+// Router Definition
 const router = express.Router();
 
-// --- 3. Route Definitions ---
+// Route Definitions
 
 // @route   POST /api/users/register
 // @desc    Register a new user
@@ -17,5 +24,26 @@ router.post('/register', registerUser);
 // @access  Public
 router.post('/login', loginUser);
 
-// --- 4. Export ---
+// @route   GET /api/users
+// @desc    Get all users
+// @access  Private/Admin (to be protected later)
+router.get('/', getAllUsers);
+
+// @route   GET /api/users/:id
+// @desc    Get user by ID
+// @access  Private/Admin (to be protected later)
+router.get('/:id', getUserById);
+
+// @route   PUT /api/users/:id/role
+// @desc    Update user role
+// @access  Private/Admin (to be protected later)
+router.put('/:id/role', updateUserRole);
+
+// @route   DELETE /api/users/:id
+// @desc    Delete a user
+// @access  Private/Admin (to be protected later)
+router.delete('/:id', deleteUser);
+
+
+// Export
 module.exports = router;
