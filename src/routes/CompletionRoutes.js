@@ -1,10 +1,10 @@
 import express from "express";
-import { 
-  createOrUpdateCompletion, 
-  getCompletionsBySprint, 
-  getCompletionByUser, 
-  deleteCompletion 
-} from "../controllers/CompletionController";
+import {
+    createOrUpdateCompletion,
+    getCompletionsBySprint,
+    getCompletionByUser,
+    deleteCompletion
+} from "../controllers/completionController.js"
 
 const router = express.Router();
 

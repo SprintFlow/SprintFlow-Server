@@ -7,7 +7,7 @@ import 'dotenv/config'; // Configura dotenv para Módulos ES
 // Nota: La importación predeterminada funciona solo si las rutas usan 'export default'.
 import userRoutes from './src/routes/userRoutes.js'; 
 import sprintRoutes from './src/routes/sprintRoutes.js';
-import completionRoutes from './src/routes/completionRoutes.js'; 
+import completionRoutes from 'src\routes\completionRoutes.js'; 
 // CRÍTICO: Asegúrate de que las rutas tengan la extensión .js aquí.
 
 
