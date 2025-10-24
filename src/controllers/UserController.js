@@ -38,8 +38,16 @@ const registerUser = async (req, res) => {
         // Save the new user to the database
         await newUser.save();
 
-        // Send a success response (without sending back the password)
-        res.status(201).json({ message: 'Usuario registrado con éxito' });
+        // Send a success response
+        return res.status(201).json({ 
+            message: 'Usuario registrado con éxito',
+            user: {
+                id: newUser._id,
+                name: newUser.name,
+                email: newUser.email,
+                role: newUser.role
+            }
+        }); // ⚠️ Añade return aquí
 
     } catch (error) {
         console.error('Error durante el registro del usuario:', error);
