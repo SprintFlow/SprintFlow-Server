@@ -23,11 +23,11 @@ const sprintSchema = new mongoose.Schema({
     enum: ["planned", "in_progress", "finished"],
     default: "planned",
   },
-  idealVelocity: {
+  plannedPoints: {
     type: Number,
     default: 0,
   },
-  realVelocity: {
+  realPoints: {
     type: Number,
     default: 0,
   },

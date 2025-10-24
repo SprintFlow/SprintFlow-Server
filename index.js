@@ -28,8 +28,15 @@ const startServer = async () => {
         if (!MONGO_URI) {
             throw new Error("MONGO_URI is not defined in the .env file");
         }
-        await mongoose.connect(MONGO_URI);
+        const connection = await mongoose.connect(MONGO_URI);
         console.log("Conectado a MongoDB! 🚀");
+
+        // Listar colecciones de la base de datos
+        const db = connection.connection.db;
+        const collections = await db.listCollections().toArray();
+        console.log("Colecciones disponibles en la DB:");
+        collections.forEach(col => console.log(`- ${col.name}`));
+
         app.listen(PORT, () => {
             console.log(`Servidor escuchando en http://localhost:${PORT}`);
         });
