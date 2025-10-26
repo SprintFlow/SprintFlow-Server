@@ -6,7 +6,7 @@ import {
   updateSprint,
   deleteSprint,
 } from "../controllers/sprintController.js";
-import { protect, admin } from "../middleware/authMiddleware.js";
+import { protect, admin } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 

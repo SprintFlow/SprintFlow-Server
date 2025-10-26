@@ -1,7 +1,6 @@
-const User = require('../models/UserModel.js');
-const bcrypt = require('bcryptjs');
+import User from '../models/UserModel.js';
+import bcrypt from 'bcryptjs';
 // const { generateToken } = require('../utils/tokenUtils'); // This will be provided by Paloma
-
 
 // -- REGISTER CONTROLLER -- //
 
@@ -10,8 +9,7 @@ const bcrypt = require('bcryptjs');
  * @route   POST /api/users/register
  * @access  Public
  */
-
-const registerUser = async (req, res) => {
+export const registerUser = async (req, res) => {
     try {
         // Get data from request body
         const { name, email, password } = req.body;
@@ -47,7 +45,7 @@ const registerUser = async (req, res) => {
                 email: newUser.email,
                 role: newUser.role
             }
-        }); // ⚠️ Añade return aquí
+        });
 
     } catch (error) {
         console.error('Error durante el registro del usuario:', error);
@@ -58,12 +56,11 @@ const registerUser = async (req, res) => {
 // -- LOGIN CONTROLLER -- //
 
 /**
- * @desc    Register a new user
- * @route   POST /api/users/register
+ * @desc    Authenticate a user & get token
+ * @route   POST /api/users/login
  * @access  Public
  */
-
-const loginUser = async (req, res) => {
+export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -98,7 +95,6 @@ const loginUser = async (req, res) => {
     }
 };
 
-
 // --- USER CRUD --- //
 
 /**
@@ -106,7 +102,7 @@ const loginUser = async (req, res) => {
  * @route   GET /api/users
  * @access  Private/Admin
  */
-const getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res) => {
     try {
         const users = await User.find({}).select('-password');
         res.status(200).json(users);
@@ -121,7 +117,7 @@ const getAllUsers = async (req, res) => {
  * @route   GET /api/users/:id
  * @access  Private/Admin
  */
-const getUserById = async (req, res) => {
+export const getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id).select('-password');
 
@@ -141,7 +137,7 @@ const getUserById = async (req, res) => {
  * @route   PUT /api/users/:id/role
  * @access  Private/Admin
  */
-const updateUserRole = async (req, res) => {
+export const updateUserRole = async (req, res) => {
     try {
         const { role } = req.body;
         const user = await User.findByIdAndUpdate(
@@ -166,7 +162,7 @@ const updateUserRole = async (req, res) => {
  * @route   DELETE /api/users/:id
  * @access  Private/Admin
  */
-const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id);
 
@@ -179,14 +175,4 @@ const deleteUser = async (req, res) => {
         console.error('Error al eliminar el usuario:', error);
         res.status(500).json({ message: 'Error del servidor al eliminar el usuario' });
     }
-};
-
-// Exports
-module.exports = {
-    registerUser,
-    loginUser,
-    getAllUsers,
-    getUserById,
-    updateUserRole,
-    deleteUser,
 };
