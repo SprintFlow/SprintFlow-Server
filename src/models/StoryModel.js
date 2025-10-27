@@ -8,12 +8,12 @@ const storySchema = new mongoose.Schema({
     },
     sprintId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Sprint",
+        ref: "Sprints",
         default: null,
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "Users",
         default: null,
     },
     points: {

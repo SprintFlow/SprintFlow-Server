@@ -19,7 +19,7 @@ export const createStory = async (req, res) => {
 // GET - stories
 export const getStories= async (req, res) => {
     try {
-        const stories = await StoryModel.find().populate("userId sprintID")
+        const stories = await StoryModel.find().populate("userId sprintId")
         res.json(stories)
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -55,11 +55,11 @@ export const getStoriesBySprint = async (req, res) => {
 export const updateStory = async (req, res) => {
     try {
         const { id } = req.params
-        const { title, poinst, status } = req.body
+        const { title, points, status } = req.body
 
         const story = await StoryModel.findByIdAndUpdate(
-            id, { title, poinst, status },
-            { new: true } //?
+            id, { title, points, status },
+            { new: true, runValidators: true } //?
         )
 
         if (!story) return res.status(404).json({ message: "Story no encontrada "})
@@ -75,7 +75,11 @@ export const updateStoryPoints = async (req, res) => {
         const { id } = req.params
         const { points } = req.body
 
-        const story = await StoryModel.findByIdAndUpdate(id, { points }, { new: true })
+        if (points == null || points < 0) {
+            return res.status(400).json({ message: "Points inválidos" })
+        }
+
+        const story = await StoryModel.findByIdAndUpdate(id, { points }, { new: true, runValidators: true })
         if (!story) return res.status(404).json({ message: "Story no encontrada" })
 
         res.json(story)
@@ -88,7 +92,7 @@ export const updateStoryPoints = async (req, res) => {
 export const deleteStory = async (req, res) => {
     try {
         const { id } = req.params
-        const story = await StoryModel.findByIdAndUpdate(id)
+        const story = await StoryModel.findByIdAndDelete(id)
         if (!story) return res.status(404).json({ message: "Story no encontrada" })
         res.json({ message: "Story eliminada correctamente" })
     } catch (error) {
