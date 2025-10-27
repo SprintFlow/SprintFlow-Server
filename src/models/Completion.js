@@ -24,4 +24,4 @@ completionSchema.pre("save", function(next) {
   next();
 });
 
-export default mongoose.model('Completion', completionSchema);
+export default mongoose.model('Completions', completionSchema);
