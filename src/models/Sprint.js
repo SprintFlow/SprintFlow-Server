@@ -1,41 +1,42 @@
 import mongoose from "mongoose";
 
 const plannedStorySchema = new mongoose.Schema({
-  score: { type: Number, required: true }, // e.g. 0.5,1,2,3,5,8...
-  count: { type: Number, required: true }
+  score: { type: Number, required: true }, // e.g. 0.5, 1, 2, 3, 5, 8
+  quantity: { type: Number, required: true }
 }, { _id: false });
 
 const teamMemberSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  hours: { type: Number, default: 0 } // opcional
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  hoursLectivas: { type: Number, default: 0 }
 }, { _id: false });
 
 const sprintSchema = new mongoose.Schema({
-  name: { type: String, required: true, trim: true },
+  name: { type: String, required: true },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
 
-  plannedPoints: { type: [plannedStorySchema], default: [] },
-  totalPlannedPoints: { type: Number, default: 0 },
+  adminId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 
-  goal: { type: String, required: true },
-  isObjectiveCompleted: { type: Boolean, default: false },
+  plannedStories: { type: [plannedStorySchema], default: [] },
+  plannedTotalPoints: { type: Number, default: 0 },
+
+  usersAssigned: { type: [teamMemberSchema], default: [] },
+
+  finalCompletionTotalPoints: { type: Number, default: 0 },
+  finalObjectiveAchieved: { type: Boolean, default: false },
 
   status: {
     type: String,
-    enum: ["planned", "active", "finished"],
-    default: "planned",
+    enum: ["Planificado", "Activo", "Completado"],
+    default: "Planificado"
   },
 
-  teamMembers: { type: [teamMemberSchema], default: [] },
-
-  observations: { type: String },
+  observations: { type: String }
 }, { timestamps: true });
 
-// pre-save para calcular totalPlannedPoints
 sprintSchema.pre("save", function (next) {
-  this.totalPlannedPoints = (this.plannedPoints || []).reduce(
-    (acc, p) => acc + (p.score * p.count),
+  this.plannedTotalPoints = (this.plannedStories || []).reduce(
+    (acc, p) => acc + (p.score * p.quantity),
     0
   );
   next();
