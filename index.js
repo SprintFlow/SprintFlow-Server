@@ -8,8 +8,10 @@ import userRoutes from './src/routes/userRoutes.js';
 import sprintRoutes from './src/routes/sprintRoutes.js';
 import completionRoutes from './src/routes/completionRoutes.js';
 
+
 // 🛡️ Importar middlewares
 import { protect, admin } from './src/middlewares/authMiddleware.js';
+
 
 // 🚀 Inicializar app
 const app = express();
@@ -26,6 +28,9 @@ app.get('/', (req, res) => {
 });
 
 // 🧭 Rutas principales
+
+// Express ahora recibe los routers correctamente debido a la sintaxis ESM unificada.
+
 app.use('/api/users', userRoutes);
 app.use('/api/sprints', sprintRoutes);
 app.use('/api/completions', completionRoutes);

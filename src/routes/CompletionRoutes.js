@@ -1,4 +1,5 @@
 import express from "express";
+
 import {
   createOrUpdateCompletion,
   getCompletionsBySprint,
@@ -6,6 +7,7 @@ import {
   deleteCompletion
 } from "../controllers/completionController.js";
 import { protect, admin } from "../middlewares/authMiddleware.js";
+
 
 const router = express.Router();
 
