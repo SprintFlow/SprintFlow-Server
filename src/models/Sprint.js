@@ -6,8 +6,10 @@ const plannedStorySchema = new mongoose.Schema({
 }, { _id: false });
 
 const teamMemberSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  hoursLectivas: { type: Number, default: 0 }
+
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Users' },
+  hours: { type: Number, default: 0 } // opcional
+
 }, { _id: false });
 
 const sprintSchema = new mongoose.Schema({

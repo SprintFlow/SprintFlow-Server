@@ -7,7 +7,7 @@ import 'dotenv/config';
 import userRoutes from './src/routes/userRoutes.js';
 import sprintRoutes from './src/routes/sprintRoutes.js';
 import completionRoutes from './src/routes/completionRoutes.js';
-
+import StoryRoutes from './src/routes/StoryRoutes.js'
 
 // 🛡️ Importar middlewares
 import { protect, admin } from './src/middlewares/authMiddleware.js';
@@ -34,6 +34,7 @@ app.get('/', (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/sprints', sprintRoutes);
 app.use('/api/completions', completionRoutes);
+app.use('/api/stories', StoryRoutes)
 
 // 🔒 Ejemplo de rutas protegidas con JWT:
 app.get('/api/private', protect, (req, res) => {

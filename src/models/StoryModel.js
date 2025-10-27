@@ -28,4 +28,4 @@ const storySchema = new mongoose.Schema({
     },
 }, { timestamps: true })
 
-export default mongoose.model("Story", storySchema)
+export default mongoose.model("Stories", storySchema)
