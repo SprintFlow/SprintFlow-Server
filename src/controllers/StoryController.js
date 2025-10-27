@@ -1,4 +1,4 @@
-import Story from "../models/"
+import StoryModel from "../models/StoryModel.js"
 
 // POST - create story
 export const createStory = async (req, res) => {
@@ -9,7 +9,7 @@ export const createStory = async (req, res) => {
             return res.status(400).json({ message: "Title y points son obligatorios "})
         }
 
-        const story = await Story.create({ title, points, sprintId, userId})
+        const story = await StoryModel.create({ title, points, sprintId, userId})
         res.status(201).json(story)
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -19,7 +19,7 @@ export const createStory = async (req, res) => {
 // GET - stories
 export const getStories= async (req, res) => {
     try {
-        const stories = await Story.find().populate("userId sprintID")
+        const stories = await StoryModel.find().populate("userId sprintID")
         res.json(stories)
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -30,7 +30,7 @@ export const getStories= async (req, res) => {
 export const getOneStory = async (req, res) => {
     try {
         const { id } = req.params
-        const story = await Story.findById(id).populate("userId sprintId")
+        const story = await StoryModel.findById(id).populate("userId sprintId")
 
         if(!story) return res.status(404).json({ message: "Historia no encontrada"})
 
@@ -57,7 +57,7 @@ export const updateStory = async (req, res) => {
         const { id } = req.params
         const { title, poinst, status } = req.body
 
-        const story = await Story.findByIdAndUpdate(
+        const story = await StoryModel.findByIdAndUpdate(
             id, { title, poinst, status },
             { new: true } //?
         )
@@ -75,7 +75,7 @@ export const updateStoryPoints = async (req, res) => {
         const { id } = req.params
         const { points } = req.body
 
-        const story = await Story.findByIdAndUpdate(id, { points }, { new: true })
+        const story = await StoryModel.findByIdAndUpdate(id, { points }, { new: true })
         if (!story) return res.status(404).json({ message: "Story no encontrada" })
 
         res.json(story)
@@ -88,7 +88,7 @@ export const updateStoryPoints = async (req, res) => {
 export const deleteStory = async (req, res) => {
     try {
         const { id } = req.params
-        const story = await Story.findByIdAndUpdate(id)
+        const story = await StoryModel.findByIdAndUpdate(id)
         if (!story) return res.status(404).json({ message: "Story no encontrada" })
         res.json({ message: "Story eliminada correctamente" })
     } catch (error) {

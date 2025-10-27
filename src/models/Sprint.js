@@ -6,7 +6,7 @@ const plannedStorySchema = new mongoose.Schema({
 }, { _id: false });
 
 const teamMemberSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Users' },
   hours: { type: Number, default: 0 } // opcional
 }, { _id: false });
 
@@ -41,4 +41,4 @@ sprintSchema.pre("save", function (next) {
   next();
 });
 
-export default mongoose.model("Sprint", sprintSchema);
+export default mongoose.model("Sprints", sprintSchema);
