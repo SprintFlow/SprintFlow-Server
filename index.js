@@ -10,7 +10,6 @@ import sprintRoutes from './src/routes/sprintRoutes.js';
 import completionRoutes from 'src\routes\completionRoutes.js'; 
 // CRÍTICO: Asegúrate de que las rutas tengan la extensión .js aquí.
 
-
 // 🚀 Inicializar app
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -26,6 +25,7 @@ app.get('/', (req, res) => {
 });
 
 // 🧭 Rutas principales
+
 // Express ahora recibe los routers correctamente debido a la sintaxis ESM unificada.
 app.use('/api/users', userRoutes);
 app.use('/api/sprints', sprintRoutes);
@@ -36,7 +36,6 @@ const startServer = async () => {
   try {
     if (!MONGO_URI) throw new Error('MONGO_URI no está definido en .env');
 
-    // 🌐 Conexión a MongoDB (parte crítica para el proyecto [2])
     const connection = await mongoose.connect(MONGO_URI);
     console.log('✅ Conectado a MongoDB! 🚀');
 

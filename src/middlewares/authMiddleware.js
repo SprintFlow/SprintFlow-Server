@@ -1,3 +1,4 @@
+
 import jwt from 'jsonwebtoken';
 import User from '../models/UserModel.js';
 
@@ -25,3 +26,9 @@ export const admin = (req, res, next) => {
     res.status(403).json({ message: 'Admin access required' });
   }
 };
+=======
+module.exports = (req, res, next) => {
+  console.warn('⚠️ authMiddleware aún no implementado — acceso temporalmente permitido.');
+  next();
+};
+
