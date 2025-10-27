@@ -1,12 +1,14 @@
-require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
+import express from 'express'; // Usa import en lugar de const express = require('express');
+import mongoose from 'mongoose'; // Usa import
+import cors from 'cors'; // Usa import
+import 'dotenv/config'; // Configura dotenv para Módulos ES
 
-// 🧩 Importar rutas
-const userRoutes = require('./src/routes/userRoutes');
-const sprintRoutes = require('./src/routes/sprintRoutes');
-const completionRoutes = require('./src/routes/CompletionRoutes');
+// 🧩 Importar rutas usando la sintaxis ESM (import)
+// Nota: La importación predeterminada funciona solo si las rutas usan 'export default'.
+import userRoutes from './src/routes/userRoutes.js'; 
+import sprintRoutes from './src/routes/sprintRoutes.js';
+import completionRoutes from 'src\routes\completionRoutes.js'; 
+// CRÍTICO: Asegúrate de que las rutas tengan la extensión .js aquí.
 
 // 🚀 Inicializar app
 const app = express();
@@ -23,9 +25,11 @@ app.get('/', (req, res) => {
 });
 
 // 🧭 Rutas principales
+
+// Express ahora recibe los routers correctamente debido a la sintaxis ESM unificada.
 app.use('/api/users', userRoutes);
 app.use('/api/sprints', sprintRoutes);
-app.use('/api/completions', completionRoutes);
+app.use('/api/completions', completionRoutes); // LÍNEA 26 (Aproximadamente)
 
 // 🔌 Conexión y arranque del servidor
 const startServer = async () => {

@@ -5,8 +5,10 @@ import {
   getSprintById,
   updateSprint,
   deleteSprint,
-} from "../controllers/SprintController.js";
-import { protect, admin } from "../middleware/authMiddleware.js";
+
+} from "../controllers/sprintController.js";
+import { protect, admin } from "../middlewares/authMiddleware.js";
+
 
 const router = express.Router();
 
