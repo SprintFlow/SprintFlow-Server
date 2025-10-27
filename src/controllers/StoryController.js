@@ -19,7 +19,7 @@ export const createStory = async (req, res) => {
 // GET - stories
 export const getStories= async (req, res) => {
     try {
-        const stories = await StoryModel.find().populate("userId sprintID")
+        const stories = await StoryModel.find().populate("userId sprintId")
         res.json(stories)
     } catch (error) {
         res.status(500).json({ message: error.message })
