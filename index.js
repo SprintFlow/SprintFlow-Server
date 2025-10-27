@@ -1,21 +1,24 @@
-import express from 'express'; // Usa import en lugar de const express = require('express');
-import mongoose from 'mongoose'; // Usa import
-import cors from 'cors'; // Usa import
-import 'dotenv/config'; // Configura dotenv para Módulos ES
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import 'dotenv/config';
 
-// 🧩 Importar rutas usando la sintaxis ESM (import)
-// Nota: La importación predeterminada funciona solo si las rutas usan 'export default'.
-import userRoutes from './src/routes/userRoutes.js'; 
+// 🧩 Importar rutas
+import userRoutes from './src/routes/userRoutes.js';
 import sprintRoutes from './src/routes/sprintRoutes.js';
-import completionRoutes from 'src\routes\completionRoutes.js'; 
-// CRÍTICO: Asegúrate de que las rutas tengan la extensión .js aquí.
+import completionRoutes from './src/routes/completionRoutes.js';
+
+
+// 🛡️ Importar middlewares
+import { protect, admin } from './src/middlewares/authMiddleware.js';
+
 
 // 🚀 Inicializar app
 const app = express();
 const PORT = process.env.PORT || 4000;
 const MONGO_URI = process.env.MONGO_URI;
 
-// 🛠️ Middlewares
+// 🛠️ Middlewares globales
 app.use(cors());
 app.use(express.json());
 
@@ -27,9 +30,19 @@ app.get('/', (req, res) => {
 // 🧭 Rutas principales
 
 // Express ahora recibe los routers correctamente debido a la sintaxis ESM unificada.
+
 app.use('/api/users', userRoutes);
 app.use('/api/sprints', sprintRoutes);
-app.use('/api/completions', completionRoutes); // LÍNEA 26 (Aproximadamente)
+app.use('/api/completions', completionRoutes);
+
+// 🔒 Ejemplo de rutas protegidas con JWT:
+app.get('/api/private', protect, (req, res) => {
+  res.json({ message: `Hola ${req.user.name}, accediste a una ruta protegida ✅` });
+});
+
+app.get('/api/admin', protect, admin, (req, res) => {
+  res.json({ message: `Bienvenido Admin ${req.user.name} 👑` });
+});
 
 // 🔌 Conexión y arranque del servidor
 const startServer = async () => {

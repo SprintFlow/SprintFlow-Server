@@ -1,42 +1,23 @@
 import User from '../models/UserModel.js';
 import bcrypt from 'bcryptjs';
-// const { generateToken } = require('../utils/tokenUtils'); // This will be provided by Paloma
+// const { generateToken } = require('../utils/tokenUtils'); // This will be provided by Aday
+import { generateToken } from '../utils/handleJWT.js'; // <-- Tu código nuevo para token
 
 // -- REGISTER CONTROLLER -- //
-
-/**
- * @desc    Register a new user
- * @route   POST /api/users/register
- * @access  Public
- */
 export const registerUser = async (req, res) => {
     try {
-        // Get data from request body
         const { name, email, password } = req.body;
 
-        // Basic validation: Check if all required fields are present
         if (!name || !email || !password) {
             return res.status(400).json({ message: 'Por favor, incluye nombre, email y contraseña' });
         }
 
-        // Check if user already exists in the database
         const userExists = await User.findOne({ email });
+        if (userExists) return res.status(409).json({ message: 'El email ya está registrado' });
 
-        if (userExists) {
-            return res.status(409).json({ message: 'El email ya está registrado' });
-        }
-
-        // Create a new user instance
-        const newUser = new User({
-            name,
-            email,
-            password // The password will be hashed automatically by the pre-save middleware in the model
-        });
-
-        // Save the new user to the database
+        const newUser = new User({ name, email, password });
         await newUser.save();
 
-        // Send a success response
         return res.status(201).json({ 
             message: 'Usuario registrado con éxito',
             user: {
@@ -54,39 +35,33 @@ export const registerUser = async (req, res) => {
 };
 
 // -- LOGIN CONTROLLER -- //
-
-/**
- * @desc    Authenticate a user & get token
- * @route   POST /api/users/login
- * @access  Public
- */
 export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Basic validation
         if (!email || !password) {
             return res.status(400).json({ message: 'Por favor, incluye email y contraseña' });
         }
 
-        // Find user by email
         const user = await User.findOne({ email });
 
-        // Check if user exists and if password matches
         if (user && (await bcrypt.compare(password, user.password))) {
-            // User is authenticated, generate token
-            // const token = generateToken({ id: user._id, role: user.role, isAdmin: user.isAdmin });
+            // Generamos el token dentro de la función, solo cuando el usuario es válido
+            const token = generateToken({
+                id: user._id,
+                role: user.role,
+                isAdmin: user.isAdmin
+            });
 
-            // Placeholder response until token generation is ready
-            res.status(200).json({
-                message: 'Login exitoso (token pendiente de implementación)',
+            return res.status(200).json({
+                message: 'Login exitoso',
+                token,       // <-- Token generado
                 userId: user._id,
                 name: user.name,
                 email: user.email,
                 role: user.role
             });
         } else {
-            // User not found or password incorrect
             return res.status(401).json({ message: 'Credenciales incorrectas' });
         }
     } catch (error) {
