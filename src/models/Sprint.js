@@ -42,4 +42,4 @@ sprintSchema.pre("save", function (next) {
   next();
 });
 
-export default mongoose.model("Sprint", sprintSchema);
+export default mongoose.model("Sprints", sprintSchema);
