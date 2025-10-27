@@ -7,7 +7,7 @@ import {
     updateStory,
     updateStoryPoints,
     deleteStory,
-} from '../controllers/StoryController'
+} from '../controllers/StoryController.js'
 // import { verifyToken } from "../middlewares/authMiddleware"
 
 const router = express.Router()
