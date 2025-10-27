@@ -1,44 +1,23 @@
-const User = require('../models/UserModel.js');
-const bcrypt = require('bcryptjs');
-// const { generateToken } = require('../utils/tokenUtils'); // This will be provided by Paloma
-
+import User from '../models/UserModel.js';
+import bcrypt from 'bcryptjs';
+// const { generateToken } = require('../utils/tokenUtils'); // This will be provided by Aday
+import { generateToken } from '../utils/handleJWT.js'; // <-- Tu código nuevo para token
 
 // -- REGISTER CONTROLLER -- //
-
-/**
- * @desc    Register a new user
- * @route   POST /api/users/register
- * @access  Public
- */
-
-const registerUser = async (req, res) => {
+export const registerUser = async (req, res) => {
     try {
-        // Get data from request body
         const { name, email, password } = req.body;
 
-        // Basic validation: Check if all required fields are present
         if (!name || !email || !password) {
             return res.status(400).json({ message: 'Por favor, incluye nombre, email y contraseña' });
         }
 
-        // Check if user already exists in the database
         const userExists = await User.findOne({ email });
+        if (userExists) return res.status(409).json({ message: 'El email ya está registrado' });
 
-        if (userExists) {
-            return res.status(409).json({ message: 'El email ya está registrado' });
-        }
-
-        // Create a new user instance
-        const newUser = new User({
-            name,
-            email,
-            password // The password will be hashed automatically by the pre-save middleware in the model
-        });
-
-        // Save the new user to the database
+        const newUser = new User({ name, email, password });
         await newUser.save();
 
-        // Send a success response
         return res.status(201).json({ 
             message: 'Usuario registrado con éxito',
             user: {
@@ -47,7 +26,7 @@ const registerUser = async (req, res) => {
                 email: newUser.email,
                 role: newUser.role
             }
-        }); // ⚠️ Añade return aquí
+        });
 
     } catch (error) {
         console.error('Error durante el registro del usuario:', error);
@@ -56,40 +35,33 @@ const registerUser = async (req, res) => {
 };
 
 // -- LOGIN CONTROLLER -- //
-
-/**
- * @desc    Register a new user
- * @route   POST /api/users/register
- * @access  Public
- */
-
-const loginUser = async (req, res) => {
+export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Basic validation
         if (!email || !password) {
             return res.status(400).json({ message: 'Por favor, incluye email y contraseña' });
         }
 
-        // Find user by email
         const user = await User.findOne({ email });
 
-        // Check if user exists and if password matches
         if (user && (await bcrypt.compare(password, user.password))) {
-            // User is authenticated, generate token
-            // const token = generateToken({ id: user._id, role: user.role, isAdmin: user.isAdmin });
+            // Generamos el token dentro de la función, solo cuando el usuario es válido
+            const token = generateToken({
+                id: user._id,
+                role: user.role,
+                isAdmin: user.isAdmin
+            });
 
-            // Placeholder response until token generation is ready
-            res.status(200).json({
-                message: 'Login exitoso (token pendiente de implementación)',
+            return res.status(200).json({
+                message: 'Login exitoso',
+                token,       // <-- Token generado
                 userId: user._id,
                 name: user.name,
                 email: user.email,
                 role: user.role
             });
         } else {
-            // User not found or password incorrect
             return res.status(401).json({ message: 'Credenciales incorrectas' });
         }
     } catch (error) {
@@ -98,7 +70,6 @@ const loginUser = async (req, res) => {
     }
 };
 
-
 // --- USER CRUD --- //
 
 /**
@@ -106,7 +77,7 @@ const loginUser = async (req, res) => {
  * @route   GET /api/users
  * @access  Private/Admin
  */
-const getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res) => {
     try {
         const users = await User.find({}).select('-password');
         res.status(200).json(users);
@@ -121,7 +92,7 @@ const getAllUsers = async (req, res) => {
  * @route   GET /api/users/:id
  * @access  Private/Admin
  */
-const getUserById = async (req, res) => {
+export const getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id).select('-password');
 
@@ -141,7 +112,7 @@ const getUserById = async (req, res) => {
  * @route   PUT /api/users/:id/role
  * @access  Private/Admin
  */
-const updateUserRole = async (req, res) => {
+export const updateUserRole = async (req, res) => {
     try {
         const { role } = req.body;
         const user = await User.findByIdAndUpdate(
@@ -166,7 +137,7 @@ const updateUserRole = async (req, res) => {
  * @route   DELETE /api/users/:id
  * @access  Private/Admin
  */
-const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id);
 
@@ -179,14 +150,4 @@ const deleteUser = async (req, res) => {
         console.error('Error al eliminar el usuario:', error);
         res.status(500).json({ message: 'Error del servidor al eliminar el usuario' });
     }
-};
-
-// Exports
-module.exports = {
-    registerUser,
-    loginUser,
-    getAllUsers,
-    getUserById,
-    updateUserRole,
-    deleteUser,
 };

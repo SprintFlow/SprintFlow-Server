@@ -1,13 +1,12 @@
-// Dependencies
-const express = require('express');
-const {
+import express from 'express';
+import {
     registerUser,
     loginUser,
     getAllUsers,
     getUserById,
     updateUserRole,
     deleteUser
-} = require('../controllers/userController.js');
+} from '../controllers/UserController.js';
 
 // Router Definition
 const router = express.Router();
@@ -44,6 +43,5 @@ router.put('/:id/role', updateUserRole);
 // @access  Private/Admin (to be protected later)
 router.delete('/:id', deleteUser);
 
-
 // Export
-module.exports = router;
+export default router;
