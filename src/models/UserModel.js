@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['Developer', 'QA', 'Scrum Master'],
+        enum: ['Developer', 'QA', 'Scrum Master', 'Admin'],
         default: 'Developer'
     },
     isAdmin: {
@@ -31,18 +31,12 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Mongoose Middleware
-// Hash password before saving the user document to the database.
-userSchema.pre('save', async function(next) {
-    // Only hash the password if it has been modified (or is new)
-    if (!this.isModified('password')) return next();
-    
-    try {
-        const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(this.password, salt);
-        next(); // ⚠️ ESTO FALTA - es crucial para que el middleware termine
-    } catch (error) {
-        next(error); // Propagar el error si algo falla
-    }
+userSchema.pre('save', async function() {
+    // Solo hashea la contraseña si ha sido modificada (o es nueva).
+    // Con funciones async, Mongoose gestiona el `next()` automáticamente.
+    if (!this.isModified('password')) return;
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
 });
 
 // Model Export

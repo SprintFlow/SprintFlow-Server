@@ -44,6 +44,9 @@ export const loginUser = async (req, res) => {
         }
 
         const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
 
         if (user && (await bcrypt.compare(password, user.password))) {
             // Generamos el token dentro de la función, solo cuando el usuario es válido
