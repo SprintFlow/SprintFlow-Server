@@ -7,6 +7,7 @@ import {
     updateUserRole,
     deleteUser
 } from '../controllers/UserController.js';
+import { protect, admin } from '../middlewares/authMiddleware.js';
 
 // Router Definition
 const router = express.Router();
@@ -25,23 +26,23 @@ router.post('/login', loginUser);
 
 // @route   GET /api/users
 // @desc    Get all users
-// @access  Private/Admin (to be protected later)
-router.get('/', getAllUsers);
+// @access  Private/Admin
+router.get('/', protect, admin, getAllUsers);
 
 // @route   GET /api/users/:id
 // @desc    Get user by ID
-// @access  Private/Admin (to be protected later)
-router.get('/:id', getUserById);
+// @access  Private/Admin
+router.get('/:id', protect, admin, getUserById);
 
 // @route   PUT /api/users/:id/role
 // @desc    Update user role
-// @access  Private/Admin (to be protected later)
-router.put('/:id/role', updateUserRole);
+// @access  Private/Admin
+router.put('/:id/role', protect, admin, updateUserRole);
 
 // @route   DELETE /api/users/:id
 // @desc    Delete a user
-// @access  Private/Admin (to be protected later)
-router.delete('/:id', deleteUser);
+// @access  Private/Admin
+router.delete('/:id', protect, admin, deleteUser);
 
 // Export
 export default router;
