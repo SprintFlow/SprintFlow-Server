@@ -4,6 +4,7 @@ import cors from 'cors';
 import 'dotenv/config';
 
 // 🧩 Importar rutas
+import authRoutes from './src/routes/AuthRoutes.js';
 import userRoutes from './src/routes/userRoutes.js';
 import sprintRoutes from './src/routes/sprintRoutes.js';
 import completionRoutes from './src/routes/completionRoutes.js';
@@ -30,11 +31,11 @@ app.get('/', (req, res) => {
 // 🧭 Rutas principales
 
 // Express ahora recibe los routers correctamente debido a la sintaxis ESM unificada.
-
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/sprints', sprintRoutes);
 app.use('/api/completions', completionRoutes);
-app.use('/api/stories', StoryRoutes)
+app.use('/api/stories', StoryRoutes);
 
 // 🔒 Ejemplo de rutas protegidas con JWT:
 app.get('/api/private', protect, (req, res) => {
