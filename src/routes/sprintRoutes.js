@@ -6,16 +6,15 @@ import {
   updateSprint,
   deleteSprint,
 } from "../controllers/sprintController.js";
-import { protect } from "../middlewares/authMiddleware.js";
-import { authorizeRoles } from "../middlewares/roleMiddleware.js";
+import { protect, admin } from "../middlewares/authMiddleware.js";  // ✅ Usar admin
 
 const router = express.Router();
 
 // CRUD Sprints
-router.post("/", protect, authorizeRoles("admin"), createSprint);
+router.post("/", protect, admin, createSprint);        // ✅ Cambiar aquí
 router.get("/", protect, getAllSprints);
 router.get("/:id", protect, getSprintById);
-router.put("/:id", protect, authorizeRoles("admin"), updateSprint);
-router.delete("/:id", protect, authorizeRoles("admin"), deleteSprint);
+router.put("/:id", protect, admin, updateSprint);      // ✅ Cambiar aquí
+router.delete("/:id", protect, admin, deleteSprint);   // ✅ Cambiar aquí
 
 export default router;
