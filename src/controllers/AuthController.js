@@ -17,7 +17,6 @@ export const registerUser = async (req, res) => {
         const newUser = new User({ name, email, password });
         await newUser.save();
 
-        // **CORRECCIÓN: Crear objeto plano para el token**
         const token = generateToken({
             id: newUser._id,
             role: newUser.role,
@@ -26,12 +25,13 @@ export const registerUser = async (req, res) => {
 
         return res.status(201).json({ 
             message: 'Usuario registrado con éxito',
-            token,  // Incluir token en la respuesta
+            token,
             user: {
                 id: newUser._id,
                 name: newUser.name,
                 email: newUser.email,
-                role: newUser.role
+                role: newUser.role,
+                isAdmin: newUser.isAdmin  // ✅ Añadir isAdmin
             }
         });
 
@@ -53,7 +53,6 @@ export const loginUser = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (user && (await bcrypt.compare(password, user.password))) {
-            // **CORRECCIÓN: Ya estás pasando un objeto plano correctamente**
             const token = generateToken({
                 id: user._id,
                 role: user.role,
@@ -63,10 +62,13 @@ export const loginUser = async (req, res) => {
             return res.status(200).json({
                 message: 'Login exitoso',
                 token,
-                userId: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                    isAdmin: user.isAdmin  // ✅ Añadir isAdmin
+                }
             });
         } else {
             return res.status(401).json({ message: 'Credenciales incorrectas' });
@@ -75,113 +77,4 @@ export const loginUser = async (req, res) => {
         console.error('Error durante el login del usuario:', error);
         res.status(500).json({ message: 'Error del servidor al iniciar sesión' });
     }
-};
-
-// --- USER CRUD --- //
-
-/**
- * @desc    Get all users
- * @route   GET /api/users
- * @access  Private/Admin
- */
-export const getAllUsers = async (req, res) => {
-    try {
-        const users = await User.find({}).select('-password');
-        res.status(200).json(users);
-    } catch (error) {
-        console.error('Error al obtener todos los usuarios:', error);
-        res.status(500).json({ message: 'Error del servidor al obtener los usuarios' });
-    }
-};
-
-/**
- * @desc    Get user by ID
- * @route   GET /api/users/:id
- * @access  Private/Admin
- */
-export const getUserById = async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id).select('-password');
-
-        if (user) {
-            res.status(200).json(user);
-        } else {
-            res.status(404).json({ message: 'Usuario no encontrado' });
-        }
-    } catch (error) {
-        console.error('Error al obtener usuario por ID:', error);
-        res.status(500).json({ message: 'Error del servidor al obtener el usuario' });
-    }
-};
-
-/**
- * @desc    Update user role
- * @route   PUT /api/users/:id/role
- * @access  Private/Admin
- */
-export const updateUserRole = async (req, res) => {
-    try {
-        const { role } = req.body;
-        const user = await User.findByIdAndUpdate(
-            req.params.id,
-            { role },
-            { new: true, runValidators: true }
-        ).select('-password');
-
-        if (user) {
-            res.status(200).json(user);
-        } else {
-            res.status(404).json({ message: 'Usuario no encontrado' });
-        }
-    } catch (error) {
-        console.error('Error al actualizar el rol del usuario:', error);
-        res.status(500).json({ message: 'Error del servidor al actualizar el rol' });
-    }
-};
-
-/**
-
- * @desc    Delete a user
- * @route   DELETE /api/users/:id
- * @access  Private/Admin
- */
-export const deleteUser = async (req, res) => {
-    try {
-        const user = await User.findByIdAndDelete(req.params.id);
-
-        if (user) {
-            res.status(200).json({ message: 'Usuario eliminado correctamente' });
-        } else {
-            res.status(404).json({ message: 'Usuario no encontrado' });
-        }
-    } catch (error) {
-        console.error('Error al eliminar el usuario:', error);
-        res.status(500).json({ message: 'Error del servidor al eliminar el usuario' });
-    }
- * @desc Registrar un nuevo usuario
- * @route POST /api/auth/register
- */
-export const registerUser = async (req, res) => {
-  try {
-    const { name, email, password, role } = req.body;
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ message: "El email ya está en uso" });
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      role,
-    });
-
-    const token = generateToken(user);
-    res.status(201).json({ token, user });
-  } catch (error) {
-    console.error("Error al registrar usuario:", error);
-    res.status(500).json({ message: "Error del servidor al registrar usuario" });
-  }
-
 };

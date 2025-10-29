@@ -5,26 +5,16 @@ import {
   getSprintById,
   updateSprint,
   deleteSprint,
-
 } from "../controllers/sprintController.js";
-import { protect, admin } from "../middlewares/authMiddleware.js";
-
+import { protect, admin } from "../middlewares/authMiddleware.js";  // ✅ Usar admin
 
 const router = express.Router();
 
-// Crear un sprint → solo admin
-router.post("/", protect, admin, createSprint);
-
-// Obtener todos los sprints → cualquier usuario autenticado
+// CRUD Sprints
+router.post("/", protect, admin, createSprint);        // ✅ Cambiar aquí
 router.get("/", protect, getAllSprints);
-
-// Obtener un sprint por ID → cualquier usuario autenticado
 router.get("/:id", protect, getSprintById);
-
-// Actualizar sprint → solo admin
-router.put("/:id", protect, admin, updateSprint);
-
-// Eliminar sprint → solo admin
-router.delete("/:id", protect, admin, deleteSprint);
+router.put("/:id", protect, admin, updateSprint);      // ✅ Cambiar aquí
+router.delete("/:id", protect, admin, deleteSprint);   // ✅ Cambiar aquí
 
 export default router;
