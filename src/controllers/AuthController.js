@@ -1,6 +1,7 @@
 import User from '../models/UserModel.js';
 import bcrypt from 'bcryptjs';
 import { generateToken } from '../utils/handleJWT.js';
+import Completion from '../models/Completion.js';
 
 // -- REGISTER CONTROLLER -- //
 export const registerUser = async (req, res) => {
@@ -76,5 +77,41 @@ export const loginUser = async (req, res) => {
     } catch (error) {
         console.error('Error durante el login del usuario:', error);
         res.status(500).json({ message: 'Error del servidor al iniciar sesión' });
+    }
+};
+
+/**
+ * @desc    Get current authenticated user
+ * @route   GET /api/auth/me
+ * @access  Private
+ */
+export const getCurrentUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+
+        // Obtener estadísticas del usuario
+        const completions = await Completion.find({ userId: req.user.id });
+        const totalPoints = completions.reduce((sum, comp) => sum + (comp.totalCompletedPoints || 0), 0);
+        const completedStories = completions.reduce((sum, comp) => sum + (comp.completedStories?.length || 0), 0);
+
+        res.status(200).json({
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            isAdmin: user.isAdmin,
+            statistics: {
+                totalPoints,
+                completedStories,
+                activeStories: 0
+            }
+        });
+    } catch (error) {
+        console.error('Error al obtener usuario actual:', error);
+        res.status(500).json({ message: 'Error del servidor al obtener el usuario' });
     }
 };
