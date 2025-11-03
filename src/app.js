@@ -1,35 +1,43 @@
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import connectDB from "./config/db.js";
-import authRoutes from "../routes/authRoutes.js";
-import userRoutes from "../routes/userRoutes.js";
-import sprintRoutes from "../routes/sprintRoutes.js";
-
-dotenv.config();
-connectDB();
+import express from 'express';
+import cors from 'cors';
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import sprintRoutes from './routes/sprintRoutes.js';
+import completionRoutes from './routes/completionRoutes.js';
+import StoryRoutes from './routes/StoryRoutes.js';
+import { protect, admin } from './middlewares/authMiddleware.js';
 
 const app = express();
+
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// ✅ Logging middleware
+// Logging middleware
 app.use((req, res, next) => {
   console.log(`📍 ${req.method} ${req.path}`);
   next();
 });
 
-// Rutas API
-app.use("/api/auth", authRoutes);
-app.use("/api/userSprint", userRoutes);
-app.use("/api/sprints", sprintRoutes); // ✅ AGREGAR ESTA LÍNEA
+// Rutas
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/sprints', sprintRoutes);
+app.use('/api/completions', completionRoutes);
+app.use('/api/stories', StoryRoutes);
 
-app.get("/", (req, res) => {
-  res.send("✅ SprintFlow API en ejecución");
+// Rutas de prueba / protegidas
+app.get('/api/private', protect, (req, res) => {
+  res.json({ message: `Hola ${req.user.name}, accediste a una ruta protegida` });
 });
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
-  console.log(`📡 API: http://localhost:${PORT}/api`);
+app.get('/api/admin', protect, admin, (req, res) => {
+  res.json({ message: `Bienvenido Admin ${req.user.name}` });
 });
+
+// Health check
+app.get('/', (req, res) => {
+  res.send('Servidor funcionando');
+});
+
+export default app;
