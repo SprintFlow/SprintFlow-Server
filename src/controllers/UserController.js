@@ -199,7 +199,7 @@ export const getCurrentUser = async (req, res) => {
  */
 export const updateUserProfile = async (req, res) => {
     try {
-        const { name, email } = req.body;
+        const { name, email, avatar } = req.body;
         
         const user = await User.findById(req.user._id);
         
@@ -218,6 +218,7 @@ export const updateUserProfile = async (req, res) => {
         // Actualizar campos
         if (name) user.name = name;
         if (email) user.email = email;
+        if (avatar !== undefined) user.avatar = avatar;
 
         await user.save();
 
@@ -227,7 +228,8 @@ export const updateUserProfile = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                avatar: user.avatar
             }
         });
     } catch (error) {

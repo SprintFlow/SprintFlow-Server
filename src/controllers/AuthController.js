@@ -32,7 +32,8 @@ export const registerUser = async (req, res) => {
                 name: newUser.name,
                 email: newUser.email,
                 role: newUser.role,
-                isAdmin: newUser.isAdmin  // ✅ Añadir isAdmin
+                isAdmin: newUser.isAdmin,
+                avatar: newUser.avatar
             }
         });
 
@@ -68,7 +69,8 @@ export const loginUser = async (req, res) => {
                     name: user.name,
                     email: user.email,
                     role: user.role,
-                    isAdmin: user.isAdmin  // ✅ Añadir isAdmin
+                    isAdmin: user.isAdmin,
+                    avatar: user.avatar
                 }
             });
         } else {
