@@ -201,6 +201,14 @@ export const updateUserProfile = async (req, res) => {
     try {
         const { name, email, avatar } = req.body;
         
+        console.log('Actualizando perfil:', {
+            userId: req.user._id,
+            hasName: !!name,
+            hasEmail: !!email,
+            hasAvatar: !!avatar,
+            avatarLength: avatar?.length
+        });
+        
         const user = await User.findById(req.user._id);
         
         if (!user) {
@@ -221,6 +229,11 @@ export const updateUserProfile = async (req, res) => {
         if (avatar !== undefined) user.avatar = avatar;
 
         await user.save();
+
+        console.log('Perfil actualizado:', {
+            userId: user._id,
+            avatarSaved: !!user.avatar
+        });
 
         res.status(200).json({
             message: 'Perfil actualizado exitosamente',
