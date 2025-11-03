@@ -26,6 +26,14 @@ app.use('/api/sprints', sprintRoutes);
 app.use('/api/completions', completionRoutes);
 app.use('/api/stories', StoryRoutes);
 
+// Log de rutas registradas
+console.log('✅ Rutas registradas:');
+console.log('  - /api/auth');
+console.log('  - /api/users');
+console.log('  - /api/sprints');
+console.log('  - /api/completions');
+console.log('  - /api/stories');
+
 // Rutas de prueba / protegidas
 app.get('/api/private', protect, (req, res) => {
   res.json({ message: `Hola ${req.user.name}, accediste a una ruta protegida` });
