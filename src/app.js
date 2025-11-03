@@ -1,9 +1,9 @@
 import express from 'express';
 import cors from 'cors';
-import authRoutes from './routes/authRoutes.js';
-import userRoutes from './routes/userRoutes.js';
+import authRoutes from './routes/AuthRoutes.js';
+import userRoutes from './routes/UserRoutes.js';
 import sprintRoutes from './routes/sprintRoutes.js';
-import completionRoutes from './routes/completionRoutes.js';
+import completionRoutes from './routes/CompletionRoutes.js';
 import StoryRoutes from './routes/StoryRoutes.js';
 import { protect, admin } from './middlewares/authMiddleware.js';
 
@@ -25,6 +25,14 @@ app.use('/api/users', userRoutes);
 app.use('/api/sprints', sprintRoutes);
 app.use('/api/completions', completionRoutes);
 app.use('/api/stories', StoryRoutes);
+
+// Log de rutas registradas
+console.log('✅ Rutas registradas:');
+console.log('  - /api/auth');
+console.log('  - /api/users');
+console.log('  - /api/sprints');
+console.log('  - /api/completions');
+console.log('  - /api/stories');
 
 // Rutas de prueba / protegidas
 app.get('/api/private', protect, (req, res) => {
