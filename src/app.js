@@ -1,9 +1,9 @@
 import express from 'express';
 import cors from 'cors';
-import authRoutes from './routes/authRoutes.js';
-import userRoutes from './routes/userRoutes.js';
+import authRoutes from './routes/AuthRoutes.js';
+import userRoutes from './routes/UserRoutes.js';
 import sprintRoutes from './routes/sprintRoutes.js';
-import completionRoutes from './routes/completionRoutes.js';
+import completionRoutes from './routes/CompletionRoutes.js';
 import StoryRoutes from './routes/StoryRoutes.js';
 import { protect, admin } from './middlewares/authMiddleware.js';
 
