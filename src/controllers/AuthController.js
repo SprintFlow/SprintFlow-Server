@@ -87,14 +87,14 @@ export const loginUser = async (req, res) => {
  */
 export const getCurrentUser = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select('-password');
+        const user = await User.findById(req.user._id).select('-password');
         
         if (!user) {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
 
         // Obtener estadísticas del usuario
-        const completions = await Completion.find({ userId: req.user.id });
+        const completions = await Completion.find({ userId: req.user._id });
         const totalPoints = completions.reduce((sum, comp) => sum + (comp.totalCompletedPoints || 0), 0);
         const completedStories = completions.reduce((sum, comp) => sum + (comp.completedStories?.length || 0), 0);
 

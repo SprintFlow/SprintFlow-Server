@@ -163,14 +163,14 @@ export const deleteUser = async (req, res) => {
  */
 export const getCurrentUser = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select('-password');
+        const user = await User.findById(req.user._id).select('-password');
         
         if (!user) {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
 
         // Obtener estadísticas del usuario
-        const completions = await Completion.find({ userId: req.user.id });
+        const completions = await Completion.find({ userId: req.user._id });
         const totalPoints = completions.reduce((sum, comp) => sum + (comp.totalCompletedPoints || 0), 0);
         const completedStories = completions.reduce((sum, comp) => sum + (comp.completedStories?.length || 0), 0);
 
@@ -201,7 +201,7 @@ export const updateUserProfile = async (req, res) => {
     try {
         const { name, email } = req.body;
         
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user._id);
         
         if (!user) {
             return res.status(404).json({ message: 'Usuario no encontrado' });
@@ -261,11 +261,16 @@ export const changePassword = async (req, res) => {
             });
         }
 
-        const user = await User.findById(req.user.id);
+        // ✅ CORRECCIÓN: usar req.user._id en lugar de req.user.id
+        console.log('🔍 Buscando usuario con ID:', req.user._id);
+        const user = await User.findById(req.user._id);
         
         if (!user) {
+            console.error('❌ Usuario no encontrado con ID:', req.user._id);
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
+
+        console.log('✅ Usuario encontrado:', user.name);
 
         // Verificar contraseña actual
         const isMatch = await bcrypt.compare(currentPassword, user.password);
