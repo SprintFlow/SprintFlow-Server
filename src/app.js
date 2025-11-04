@@ -6,6 +6,7 @@ import sprintRoutes from './routes/sprintRoutes.js';
 import completionRoutes from './routes/CompletionRoutes.js';
 import StoryRoutes from './routes/StoryRoutes.js';
 import { protect, admin } from './middlewares/authMiddleware.js';
+import pointsRegistryRoutes from './routes/pointsRegistryRoutes.js';
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/sprints', sprintRoutes);
 app.use('/api/completions', completionRoutes);
 app.use('/api/stories', StoryRoutes);
+app.use('/api/points-registry', pointsRegistryRoutes);
 
 // Log de rutas registradas
 console.log('✅ Rutas registradas:');
