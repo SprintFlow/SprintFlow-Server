@@ -6,7 +6,7 @@ const plannedStorySchema = new mongoose.Schema({
 }, { _id: false });
 
 const teamMemberSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Users' },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   hours: { type: Number, default: 0 }
 }, { _id: false });
 
@@ -14,7 +14,7 @@ const sprintSchema = new mongoose.Schema({
   name: { type: String, required: true },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
-  adminId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  adminId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   plannedStories: { type: [plannedStorySchema], default: [] },
   plannedTotalPoints: { type: Number, default: 0 },
   usersAssigned: { type: [teamMemberSchema], default: [] },
@@ -25,10 +25,18 @@ const sprintSchema = new mongoose.Schema({
     enum: ["Planificado", "Activo", "Completado", "Completado-Éxito", "Completado-Parcial"],
     default: "Planificado"
   },
-  observations: { type: String }
+  observations: { type: String },
+  // 👇 Añadimos estos dos campos para integrarlo con PointsRegistry
+  userPoints: [
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      points: { type: Number, default: 0 }
+    }
+  ],
+  completedPoints: { type: Number, default: 0 }
 }, { timestamps: true });
 
-// ✅ CALCULAR PUNTOS PLANIFICADOS
+// ✅ Calcular puntos planificados
 sprintSchema.pre("save", function (next) {
   this.plannedTotalPoints = (this.plannedStories || []).reduce(
     (acc, p) => acc + (p.score * p.quantity),
@@ -37,27 +45,23 @@ sprintSchema.pre("save", function (next) {
   next();
 });
 
-// ✅ ACTUALIZACIÓN AUTOMÁTICA DE ESTADO BASADO EN FECHAS Y PUNTOS
+// ✅ Actualización automática del estado según fechas y puntos
 sprintSchema.pre("save", function (next) {
   const now = new Date();
   const start = new Date(this.startDate);
   const end = new Date(this.endDate);
-  
-  // Resetear horas para comparar solo fechas
+
   start.setHours(0, 0, 0, 0);
   end.setHours(23, 59, 59, 999);
   const today = new Date(now.setHours(0, 0, 0, 0));
-  
+
   if (today < start) {
-    // Sprint aún no ha comenzado
     this.status = "Planificado";
   } else if (today >= start && today <= end) {
-    // Sprint en curso
     this.status = "Activo";
   } else if (today > end) {
-    // Sprint ha finalizado - determinar si fue exitoso
-    const completionRate = this.finalCompletionTotalPoints / this.plannedTotalPoints;
-    if (completionRate >= 0.8) { // 80% o más de completitud
+    const completionRate = this.finalCompletionTotalPoints / (this.plannedTotalPoints || 1);
+    if (completionRate >= 0.8) {
       this.status = "Completado-Éxito";
       this.finalObjectiveAchieved = true;
     } else {
@@ -68,32 +72,28 @@ sprintSchema.pre("save", function (next) {
   next();
 });
 
-// ✅ MÉTODO ESTÁTICO para actualizar estados automáticamente (ejecutar diariamente)
-sprintSchema.statics.updateSprintsStatus = async function() {
+// ✅ Método estático para actualización diaria automática
+sprintSchema.statics.updateSprintsStatus = async function () {
   const now = new Date();
   const today = new Date(now.setHours(0, 0, 0, 0));
-  
+
   const sprints = await this.find({
-    $or: [
-      { status: "Planificado" },
-      { status: "Activo" }
-    ]
+    $or: [{ status: "Planificado" }, { status: "Activo" }]
   });
-  
+
   for (const sprint of sprints) {
     const start = new Date(sprint.startDate);
     const end = new Date(sprint.endDate);
-    
+
     start.setHours(0, 0, 0, 0);
     end.setHours(23, 59, 59, 999);
-    
+
     if (today < start) {
       sprint.status = "Planificado";
     } else if (today >= start && today <= end) {
       sprint.status = "Activo";
     } else if (today > end) {
-      // Para sprints que acaban de finalizar
-      const completionRate = sprint.finalCompletionTotalPoints / sprint.plannedTotalPoints;
+      const completionRate = sprint.finalCompletionTotalPoints / (sprint.plannedTotalPoints || 1);
       if (completionRate >= 0.8) {
         sprint.status = "Completado-Éxito";
         sprint.finalObjectiveAchieved = true;
@@ -106,4 +106,4 @@ sprintSchema.statics.updateSprintsStatus = async function() {
   }
 };
 
-export default mongoose.model("Sprints", sprintSchema);
+export default mongoose.model("Sprint", sprintSchema);
