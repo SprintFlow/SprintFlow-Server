@@ -206,6 +206,7 @@ export const updateUserProfile = async (req, res) => {
             hasName: !!name,
             hasEmail: !!email,
             hasAvatar: !!avatar,
+            avatarValue: avatar === '' ? 'CADENA VACÍA' : (avatar ? 'TIENE VALOR' : 'NULL/UNDEFINED'),
             avatarLength: avatar?.length
         });
         
@@ -226,13 +227,18 @@ export const updateUserProfile = async (req, res) => {
         // Actualizar campos
         if (name) user.name = name;
         if (email) user.email = email;
-        if (avatar !== undefined) user.avatar = avatar;
+        
+        // Manejar avatar: si es cadena vacía, establecer null
+        if (avatar !== undefined) {
+            user.avatar = avatar === '' ? null : avatar;
+            console.log('Avatar actualizado a:', user.avatar === null ? 'NULL' : 'TIENE VALOR');
+        }
 
         await user.save();
 
         console.log('Perfil actualizado:', {
             userId: user._id,
-            avatarSaved: !!user.avatar
+            avatarFinal: user.avatar === null ? 'NULL' : 'TIENE VALOR'
         });
 
         res.status(200).json({
