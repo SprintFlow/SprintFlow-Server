@@ -59,11 +59,15 @@ export const loginUser = async (req, res) => {
 
             return res.status(200).json({
                 message: 'Login exitoso',
-                token,       // <-- Token generado
-                userId: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role
+                token,
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                    isAdmin: user.isAdmin,
+                    avatar: user.avatar
+                }
             });
         } else {
             return res.status(401).json({ message: 'Credenciales incorrectas' });
@@ -180,6 +184,7 @@ export const getCurrentUser = async (req, res) => {
             email: user.email,
             role: user.role,
             isAdmin: user.isAdmin,
+            avatar: user.avatar,
             statistics: {
                 totalPoints,
                 completedStories,
