@@ -35,6 +35,7 @@ console.log('  - /api/users');
 console.log('  - /api/sprints');
 console.log('  - /api/completions');
 console.log('  - /api/stories');
+console.log('  - /api/points-registry');
 
 // Rutas de prueba / protegidas
 app.get('/api/private', protect, (req, res) => {
