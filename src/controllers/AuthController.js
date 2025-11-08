@@ -6,16 +6,37 @@ import Completion from '../models/Completion.js';
 // -- REGISTER CONTROLLER -- //
 export const registerUser = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, securityQuestion, securityAnswer } = req.body;
 
-        if (!name || !email || !password) {
-            return res.status(400).json({ message: 'Por favor, incluye nombre, email y contraseña' });
+        // ✅ Validación actualizada con campos de seguridad
+        if (!name || !email || !password || !securityQuestion || !securityAnswer) {
+            return res.status(400).json({ 
+                message: 'Por favor, incluye nombre, email, contraseña, pregunta y respuesta de seguridad' 
+            });
+        }
+
+        // ✅ Validar longitud de la respuesta de seguridad
+        if (securityAnswer.trim().length < 2) {
+            return res.status(400).json({ 
+                message: 'La respuesta de seguridad debe tener al menos 2 caracteres' 
+            });
         }
 
         const userExists = await User.findOne({ email });
         if (userExists) return res.status(409).json({ message: 'El email ya está registrado' });
 
-        const newUser = new User({ name, email, password });
+        // ✅ Crear usuario con pregunta de seguridad
+        const newUser = new User({ 
+            name, 
+            email, 
+            password,
+            securityQuestion: {
+                question: securityQuestion,
+                answer: securityAnswer.trim() // Guardar sin espacios extras
+            },
+            hasConfiguredSecurity: true // ✅ Ya configurado desde el registro
+        });
+
         await newUser.save();
 
         const token = generateToken({
@@ -33,7 +54,8 @@ export const registerUser = async (req, res) => {
                 email: newUser.email,
                 role: newUser.role,
                 isAdmin: newUser.isAdmin,
-                avatar: newUser.avatar
+                avatar: newUser.avatar,
+                hasConfiguredSecurity: newUser.hasConfiguredSecurity
             }
         });
 
@@ -70,7 +92,8 @@ export const loginUser = async (req, res) => {
                     email: user.email,
                     role: user.role,
                     isAdmin: user.isAdmin,
-                    avatar: user.avatar
+                    avatar: user.avatar,
+                    hasConfiguredSecurity: user.hasConfiguredSecurity // ✅ Incluir este campo
                 }
             });
         } else {
@@ -89,7 +112,7 @@ export const loginUser = async (req, res) => {
  */
 export const getCurrentUser = async (req, res) => {
     try {
-        const user = await User.findById(req.user._id).select('-password');
+        const user = await User.findById(req.user._id).select('-password -securityQuestion.answer');
         
         if (!user) {
             return res.status(404).json({ message: 'Usuario no encontrado' });
@@ -106,6 +129,7 @@ export const getCurrentUser = async (req, res) => {
             email: user.email,
             role: user.role,
             isAdmin: user.isAdmin,
+            hasConfiguredSecurity: user.hasConfiguredSecurity, // ✅ Incluir este campo
             statistics: {
                 totalPoints,
                 completedStories,
@@ -115,5 +139,91 @@ export const getCurrentUser = async (req, res) => {
     } catch (error) {
         console.error('Error al obtener usuario actual:', error);
         res.status(500).json({ message: 'Error del servidor al obtener el usuario' });
+    }
+};
+
+// ✅ NUEVO: Endpoint para recuperación de contraseña
+// -- GET SECURITY QUESTION -- //
+export const getSecurityQuestion = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email es requerido' });
+    }
+
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      // Por seguridad, no revelamos si el email existe o no
+      return res.status(200).json({ 
+        securityQuestion: "¿Cuál es el nombre de tu primera mascota?" // Pregunta genérica
+      });
+    }
+
+    if (!user.securityQuestion || !user.securityQuestion.question) {
+      return res.status(200).json({ 
+        securityQuestion: "¿Cuál es el nombre de tu primera mascota?" // Pregunta por defecto
+      });
+    }
+
+    res.json({ 
+      securityQuestion: user.securityQuestion.question 
+    });
+  } catch (error) {
+    console.error('Error al obtener pregunta de seguridad:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+};
+
+// ✅ NUEVO: Verificar respuesta de seguridad
+export const verifySecurityAnswer = async (req, res) => {
+    try {
+        const { email, answer } = req.body;
+
+        if (!email || !answer) {
+            return res.status(400).json({ message: 'Email y respuesta son requeridos' });
+        }
+
+        const user = await User.findOne({ email });
+        
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+
+        if (!user.securityQuestion || user.securityQuestion.answer !== answer.trim()) {
+            return res.status(400).json({ message: 'Respuesta incorrecta' });
+        }
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error al verificar respuesta:', error);
+        res.status(500).json({ message: 'Error del servidor' });
+    }
+};
+
+// ✅ NUEVO: Resetear contraseña
+export const resetPassword = async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+
+        if (!email || !newPassword) {
+            return res.status(400).json({ message: 'Email y nueva contraseña son requeridos' });
+        }
+
+        const user = await User.findOne({ email });
+        
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+
+        // Actualizar contraseña (el pre-save hook se encargará del hash)
+        user.password = newPassword;
+        await user.save();
+
+        res.json({ success: true, message: 'Contraseña actualizada exitosamente' });
+    } catch (error) {
+        console.error('Error al resetear contraseña:', error);
+        res.status(500).json({ message: 'Error del servidor' });
     }
 };
