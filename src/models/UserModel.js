@@ -30,6 +30,22 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     default: null
+  },
+  // ✅ NUEVO: Pregunta de seguridad
+  securityQuestion: {
+    question: {
+      type: String,
+      default: "¿Cuál es el nombre de tu primera mascota?" // Pregunta por defecto
+    },
+    answer: {
+      type: String,
+      default: "mascota" // Respuesta por defecto
+    }
+  },
+  // ✅ NUEVO: Para forzar configuración en primer login
+  hasConfiguredSecurity: {
+    type: Boolean,
+    default: false
   }
 }, { timestamps: true });
 
