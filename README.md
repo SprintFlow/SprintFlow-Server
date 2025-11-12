@@ -1,4 +1,4 @@
-# 🚀 SprintFlow - Servidor (Backend)
+# SprintFlow - Servidor (Backend)
 
 ## 📖 Descripción General
 
@@ -37,14 +37,14 @@ Este servidor trabaja en conjunto con [SprintFlow-Client](../SprintFlow-Client),
 └─────────────────────────────────────┘
 ```
 
-### 🔐 Flujo de Comunicación
+### Flujo de Comunicación
 
 1. **Autenticación**: El cliente envía credenciales → El servidor valida y retorna un JWT
 2. **Autorización**: Cada petición incluye el JWT en headers → El servidor verifica permisos
 3. **Operaciones CRUD**: El cliente realiza peticiones → El servidor procesa y responde con datos
 4. **Persistencia**: Todos los datos se almacenan en MongoDB
 
-## ⚙️ Tecnologías Utilizadas
+## Tecnologías Utilizadas
 
 - **Node.js**: Entorno de ejecución JavaScript
 - **Express**: Framework web para Node.js
@@ -55,7 +55,7 @@ Este servidor trabaja en conjunto con [SprintFlow-Client](../SprintFlow-Client),
 - **dotenv**: Gestión de variables de entorno
 - **CORS**: Habilitación de peticiones cross-origin
 
-## 🚀 Instalación y Configuración
+## Instalación y Configuración
 
 ### Prerrequisitos
 - Node.js (v16 o superior)
@@ -96,7 +96,7 @@ npm start
 
 El servidor estará disponible en `http://localhost:4000`
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 SprintFlow-Server/
@@ -138,7 +138,7 @@ SprintFlow-Server/
 └── README.md
 ```
 
-## 📡 API Documentation
+## API Documentation
 
 ### 🔗 Base URL
 
@@ -146,7 +146,7 @@ SprintFlow-Server/
 http://localhost:4000/api
 ```
 
-## �🔑 Autenticación JWT
+## Autenticación JWT
 
 Todos los endpoints protegidos requieren un token JWT en el header de autorización:
 
@@ -172,11 +172,11 @@ El token se obtiene al hacer login o registrarse y tiene la siguiente estructura
 
 ---
 
-## 👤 Roles de Usuario
+## Roles de Usuario
 
 El sistema implementa un control de acceso basado en roles (RBAC):
 
-### 🟢 Developer (Desarrollador)
+### Developer (Desarrollador)
 
 **Permisos:**
 - ✅ Registrarse y hacer login
@@ -193,7 +193,7 @@ El sistema implementa un control de acceso basado en roles (RBAC):
 - ❌ No puede modificar roles de usuarios
 - ❌ No puede acceder al panel de administración
 
-### 🔴 Admin (Administrador)
+### Admin (Administrador)
 
 **Permisos:** Control total del sistema
 - ✅ Todos los permisos de Scrum Master
@@ -206,7 +206,7 @@ El sistema implementa un control de acceso basado en roles (RBAC):
 
 ---
 
-## 🔒 Códigos de Estado HTTP
+## Códigos de Estado HTTP
 
 | Código | Significado | Descripción |
 |--------|-------------|-------------|
@@ -221,7 +221,7 @@ El sistema implementa un control de acceso basado en roles (RBAC):
 
 ---
 
-## 🧪 Testing
+## Testing
 
 El proyecto incluye tests unitarios para validar el funcionamiento de los modelos y controladores. Los tests están implementados con **Jest** y **MongoDB Memory Server** para pruebas aisladas.
 
@@ -253,7 +253,7 @@ Los tests cubren los modelos principales del sistema (User, Sprint, etc.) y vali
 
 ---
 
-## 🔧 Variables de Entorno
+## Variables de Entorno
 
 Configuración requerida en archivo `.env`:
 
@@ -267,7 +267,7 @@ Configuración requerida en archivo `.env`:
 
 ---
 
-## 🚀 Despliegue
+## Despliegue
 
 ### Desarrollo
 ```bash
@@ -281,7 +281,7 @@ npm start
 
 ---
 
-## 🤝 Contribución
+## Contribución
 
 1. Fork el proyecto
 2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
@@ -291,7 +291,7 @@ npm start
 
 ---
 
-## 📝 Notas Importantes
+## Notas Importantes
 
 - **Seguridad**: Las contraseñas se hashean con bcrypt antes de almacenarse
 - **CORS**: Configurado para aceptar peticiones del cliente en puerto 5173
@@ -302,7 +302,7 @@ npm start
 
 ---
 
-## 📧 Contacto
+## Contacto
 
 Para dudas o sugerencias sobre el backend de SprintFlow, contacta al equipo de desarrollo.
 
