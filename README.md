@@ -193,26 +193,6 @@ El sistema implementa un control de acceso basado en roles (RBAC):
 - ❌ No puede modificar roles de usuarios
 - ❌ No puede acceder al panel de administración
 
-### 🟡 QA (Quality Assurance)
-
-**Permisos:** Mismos que Developer
-- ✅ Todos los permisos de Developer
-- ✅ Especializado en testing y control de calidad
-
-### 🔵 Scrum Master
-
-**Permisos:**
-- ✅ Todos los permisos de Developer
-- ✅ **Crear y gestionar sprints**
-- ✅ **Asignar usuarios a sprints**
-- ✅ **Actualizar estado de sprints**
-- ✅ Ver métricas y reportes del equipo
-- ✅ Acceso a dashboards de administración
-
-**Restricciones:**
-- ❌ No puede eliminar usuarios
-- ❌ No puede cambiar roles de otros usuarios
-
 ### 🔴 Admin (Administrador)
 
 **Permisos:** Control total del sistema
