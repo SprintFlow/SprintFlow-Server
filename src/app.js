@@ -12,8 +12,13 @@ const app = express();
 
 // Middlewares básicos
 app.use(cors());
+<<<<<<< HEAD
+app.use(express.json({ limit: '10mb' })); // Aumentar límite para imágenes Base64
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+=======
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+>>>>>>> 379b8da9a3df58b08a11e80492b1a0c8a9dc28bd
 
 // Logging middleware (solo en desarrollo, no en tests)
 if (process.env.NODE_ENV !== 'test') {

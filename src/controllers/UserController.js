@@ -59,11 +59,15 @@ export const loginUser = async (req, res) => {
 
             return res.status(200).json({
                 message: 'Login exitoso',
-                token,       // <-- Token generado
-                userId: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role
+                token,
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                    isAdmin: user.isAdmin,
+                    avatar: user.avatar
+                }
             });
         } else {
             return res.status(401).json({ message: 'Credenciales incorrectas' });
@@ -180,6 +184,7 @@ export const getCurrentUser = async (req, res) => {
             email: user.email,
             role: user.role,
             isAdmin: user.isAdmin,
+            avatar: user.avatar,
             statistics: {
                 totalPoints,
                 completedStories,
@@ -206,6 +211,7 @@ export const updateUserProfile = async (req, res) => {
             hasName: !!name,
             hasEmail: !!email,
             hasAvatar: !!avatar,
+            avatarValue: avatar === '' ? 'CADENA VACÍA' : (avatar ? 'TIENE VALOR' : 'NULL/UNDEFINED'),
             avatarLength: avatar?.length
         });
         
@@ -226,13 +232,18 @@ export const updateUserProfile = async (req, res) => {
         // Actualizar campos
         if (name) user.name = name;
         if (email) user.email = email;
-        if (avatar !== undefined) user.avatar = avatar;
+        
+        // Manejar avatar: si es cadena vacía, establecer null
+        if (avatar !== undefined) {
+            user.avatar = avatar === '' ? null : avatar;
+            console.log('Avatar actualizado a:', user.avatar === null ? 'NULL' : 'TIENE VALOR');
+        }
 
         await user.save();
 
         console.log('Perfil actualizado:', {
             userId: user._id,
-            avatarSaved: !!user.avatar
+            avatarFinal: user.avatar === null ? 'NULL' : 'TIENE VALOR'
         });
 
         res.status(200).json({

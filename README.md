@@ -1,332 +1,152 @@
-# SprintFlow - Servidor (Backend)
+# 🚀 SprintFlow - Servidor (Backend)
 
-Este repositorio contiene el backend de la aplicación SprintFlow. Provee una API RESTful para que el cliente (frontend) pueda gestionar proyectos, sprints, tareas y usuarios.
+## 📖 Descripción General
 
-# SprintFlow API Documentation
+SprintFlow es una aplicación completa de gestión ágil de proyectos que permite a equipos Scrum planificar, ejecutar y hacer seguimiento de sprints de manera eficiente. Este repositorio contiene el **backend** de la aplicación, una API RESTful construida con Node.js, Express y MongoDB.
 
-API REST para gestión de usuarios con autenticación JWT y roles diferenciados (Admin/User).
+### 🎯 Objetivo del Proyecto
 
-## 🔗 Base URL
+SprintFlow facilita la gestión de sprints mediante:
+- **Planificación de Sprints**: Definición de historias de usuario con puntos de complejidad
+- **Asignación de Recursos**: Distribución de horas por desarrollador
+- **Seguimiento en Tiempo Real**: Monitoreo del progreso y puntos completados
+- **Reportes y Métricas**: Análisis de rendimiento y cumplimiento de objetivos
+- **Gestión de Equipos**: Control de usuarios con dos roles diferentes: Admin y Developer.
+
+## 🔄 Relación con el Cliente
+
+Este servidor trabaja en conjunto con [SprintFlow-Client](../SprintFlow-Client), una aplicación React que proporciona la interfaz de usuario.
+
+**Arquitectura del Sistema:**
+```
+┌─────────────────────────────────────┐
+│   SprintFlow-Client (Frontend)      │
+│   - React + Vite                    │
+│   - Material-UI (MUI)               │
+│   - Zustand (State Management)      │
+│   - Puerto: 5173                    │
+└──────────────┬──────────────────────┘
+               │ HTTP/REST API
+               │ (JWT Authentication)
+┌──────────────▼──────────────────────┐
+│   SprintFlow-Server (Backend)       │
+│   - Node.js + Express               │
+│   - MongoDB + Mongoose              │
+│   - JWT Authentication              │
+│   - Puerto: 4000                    │
+└─────────────────────────────────────┘
+```
+
+### 🔐 Flujo de Comunicación
+
+1. **Autenticación**: El cliente envía credenciales → El servidor valida y retorna un JWT
+2. **Autorización**: Cada petición incluye el JWT en headers → El servidor verifica permisos
+3. **Operaciones CRUD**: El cliente realiza peticiones → El servidor procesa y responde con datos
+4. **Persistencia**: Todos los datos se almacenan en MongoDB
+
+## ⚙️ Tecnologías Utilizadas
+
+- **Node.js**: Entorno de ejecución JavaScript
+- **Express**: Framework web para Node.js
+- **MongoDB**: Base de datos NoSQL
+- **Mongoose**: ODM (Object Data Modeling) para MongoDB
+- **JWT (JSON Web Tokens)**: Autenticación y autorización
+- **bcrypt**: Hashing de contraseñas
+- **dotenv**: Gestión de variables de entorno
+- **CORS**: Habilitación de peticiones cross-origin
+
+## 🚀 Instalación y Configuración
+
+### Prerrequisitos
+- Node.js (v16 o superior)
+- MongoDB (local o Atlas)
+- Cliente SprintFlow corriendo en puerto 5173
+
+### Pasos de Instalación
+
+1. **Clonar el repositorio**
+```bash
+git clone https://github.com/SprintFlow/SprintFlow-Server.git
+cd SprintFlow-Server
+```
+
+2. **Instalar dependencias**
+```bash
+npm install
+```
+
+3. **Configurar variables de entorno**
+Crear un archivo `.env` en la raíz del proyecto:
+```env
+PORT=4000
+MONGO_URI=mongodb://localhost:27017/sprintflow
+JWT_SECRET=tu_clave_secreta_jwt
+NODE_ENV=development
+CLIENT_URL=http://localhost:5173
+```
+
+4. **Iniciar el servidor**
+```bash
+# Modo desarrollo (con nodemon)
+npm run dev
+
+# Modo producción
+npm start
+```
+
+El servidor estará disponible en `http://localhost:4000`
+
+## 📁 Estructura del Proyecto
+
+```
+SprintFlow-Server/
+├── src/
+│   ├── app.js                 # Configuración de Express
+│   ├── config/
+│   │   └── config.js          # Variables de configuración
+│   ├── controllers/           # Lógica de negocio
+│   │   ├── AuthController.js
+│   │   ├── UserController.js
+│   │   ├── sprintController.js
+│   │   ├── completionController.js
+│   │   └── PointsRegistryController.js
+│   ├── database/
+│   │   └── db_connection.js   # Conexión a MongoDB
+│   ├── middlewares/           # Middlewares personalizados
+│   │   ├── authMiddleware.js
+│   │   ├── roleMiddleware.js
+│   │   └── sprintStatusMiddleware.js
+│   ├── models/                # Esquemas de MongoDB
+│   │   ├── UserModel.js
+│   │   ├── Sprint.js
+│   │   ├── Completion.js
+│   │   └── PointsRegistryModel.js
+│   ├── routes/                # Definición de rutas
+│   │   ├── AuthRoutes.js
+│   │   ├── UserRoutes.js
+│   │   ├── sprintRoutes.js
+│   │   ├── CompletionRoutes.js
+│   │   └── pointsRegistryRoutes.js
+│   ├── utils/
+│   │   └── handleJWT.js       # Utilidades para JWT
+│   └── validations/
+│       └── UserValidations.js
+├── test/                      # Tests unitarios
+│   └── sprint.test.js
+├── index.js                   # Punto de entrada
+├── package.json
+└── README.md
+```
+
+## 📡 API Documentation
+
+### 🔗 Base URL
 
 ```
 http://localhost:4000/api
 ```
 
-## 📋 Índice
-
-- [Autenticación](#autenticación)
-- [Usuarios](#usuarios)
-- [Códigos de Estado](#códigos-de-estado)
-- [Autenticación JWT](#autenticación-jwt)
-- [Roles de Usuario](#roles-de-usuario)
-- [Notas](#notas)
-
----
-
-## 🔐 Autenticación
-
-### Registro de Usuario
-
-Crea una nueva cuenta de usuario.
-
-**Endpoint:** `POST /users/register`
-
-**Body (JSON):**
-
-```json
-{
-    "name": "Usuario",
-    "email": "user@test.com",
-    "password": "password123"
-}
-```
-
-**Respuesta exitosa (201):**
-
-```json
-{
-  "id": "uuid",
-  "name": "Usuario",
-  "email": "user@test.com",
-  "role": "user",
-}
-```
-
----
-
-### Login - Usuario
-
-Inicia sesión como usuario regular.
-
-**Endpoint:** `POST /login`
-
-**Body (JSON):**
-
-```json
-{
-  "email": "user@test.com",
-  "password": "password123"
-}
-```
-
-**Respuesta exitosa (200 OK):**
-
-```json
-{
-  "token": "jwt_token_here",
- "userId": "uuid",
-   "name": "Usuario",
-  "email": "user@test.com",
-   "role": "Developer" 
-}
-```
-
----
-
-### Login - Administrador
-
-Inicia sesión como administrador.
-
-**Endpoint:** `POST /login`
-
-**Body (JSON):**
-
-```json
-{
-  "email": "admin@test.com",
-  "password": "admin123"
-}
-```
-
-**Respuesta exitosa (200):**
-
-```json
-{
-  "token": "jwt_token_here",
- "userId": "uuid",
-   "name": "AdminUser",
-  "email": "Adminuser@test.com",
-   "role": "Admin" 
-}
-```
-
----
-
-## 👥 Usuarios
-
-### Obtener Todos los Usuarios (Admin)
-
-Obtiene la lista completa de usuarios. Requiere permisos de administrador.
-
-**Endpoint:** `GET /users`
-
-**Headers:**
-
-```
-Authorization: Bearer {jwt_token}
-```
-
-**Respuesta exitosa (200):**
-
-```json
-[
-  {
-    "_id": "uuid",
-    "name": "Username",
-    "email": "user1@test.com",
-    "role": "Developer",
-    "isAdmin": false,
-    "createdAt": "2025-01-01T00:00:00.000Z",
-    "updatedAt": "2025-01-01T00:00:00.000Z",
-    "__v": 0
-  },
-  {
-    "_id": "uuid",
-    "name": "Adminname",
-    "email": "adminuser1@test.com",
-    "role": "Admin",
-    "isAdmin": true,
-    "createdAt": "2025-01-01T00:00:00.000Z",
-    "updatedAt": "2025-01-01T00:00:00.000Z",
-    "__v": 0
-  },
-]
-```
-
----
-
-### Obtener Todos los Usuarios (User)
-
-Obtiene la lista de usuarios. Los usuarios regulares no pueden ver lista de usuarios.
-
-**Respuesta exitosa (403 FORBIDDEN):**
-
-```json
-
-  {
-    "message": "Acceso restringido a administradores"
-  }
-
-```
-
----
-
-### Obtener Usuario por ID (Admin)
-
-Obtiene los detalles de un usuario específico. Requiere permisos de administrador.
-
-**Endpoint:** `GET /users/:id`
-
-**Headers:**
-
-```
-Authorization: Bearer {jwt_token}
-```
-
-**Parámetros URL:**
-
-- `id` (string): ID del usuario
-
-**Respuesta exitosa (200):**
-
-```json
-  {
-    "_id": "uuid",
-    "name": "Adminname",
-    "email": "adminuser1@test.com",
-    "role": "Admin",
-    "isAdmin": true,
-    "createdAt": "2025-01-01T00:00:00.000Z",
-    "updatedAt": "2025-01-01T00:00:00.000Z",
-    "__v": 0
-  },
-```
-
----
-
-### Obtener Usuario por ID (User)
-
-Obtiene los detalles de un usuario. Los usuarios regulares solo pueden ver su propia información.
-
-**Respuesta exitosa (403 FORBIDDEN):**
-
-```json
-
-  {
-    "message": "Acceso restringido a administradores",
-  }
-
-```
-
----
-
-### Actualizar Rol de Usuario (Admin)
-
-Actualiza el rol de un usuario específico. Solo administradores pueden realizar esta acción.
-
-**Endpoint:** `PUT /api/users/:id/role`
-
-**Headers:**
-
-```
-Authorization: Bearer {jwt_token}
-```
-
-**Parámetros URL:**
-
-- `id` (string): ID del usuario
-
-**Body (JSON):**
-
-```json
-{
-  "role": "admin"
-}
-```
-
-**Respuesta exitosa (200):**
-
-```json
-  {
-    "_id": "uuid",
-    "name": "Username",
-    "email": "user1@test.com",
-    "role": "Scrum Master",
-    "isAdmin": false,
-    "createdAt": "2025-01-01T00:00:00.000Z",
-    "updatedAt": "2025-01-01T00:00:00.000Z",
-    "__v": 0
-  },
-```
-
----
-
-### Actualizar Rol de Usuario (User)
-
-Los usuarios regulares no tienen permisos para actualizar roles.
-
-**Endpoint:** `PUT /api/users/:id/role`
-
-**Respuesta exitosa (403 FORBIDDEN):**
-
-```json
-
-  {
-    "message": "Acceso restringido a administradores"
-  }
-
-```
-
----
-
-### Eliminar Usuario (Admin)
-
-Elimina un usuario del sistema. Requiere permisos de administrador.
-
-**Endpoint:** `DELETE /users/:id`
-
-**Headers:**
-
-```
-Authorization: Bearer {jwt_token}
-```
-
-**Parámetros URL:**
-
-- `id` (string): ID del usuario a eliminar
-
-**Respuesta exitosa (200):**
-
-```
-{
-    "message": "Usuario eliminado correctamente"
-}
-```
-
----
-
-### Eliminar Usuario (User)
-
-Los usuarios regulares no pueden eliminar cuentas. 
-
-**Endpoint:** `DELETE /users/:id`
-
-**Respuesta exitosa (403 FORBIDDEN):**
-
-```json
-
-  {
-    "message": "Acceso restringido a administradores",
-  }
-
-```
-
----
-
-
----
-
-## 🔑 Autenticación JWT
+## �🔑 Autenticación JWT
 
 Todos los endpoints protegidos requieren un token JWT en el header de autorización:
 
@@ -334,28 +154,162 @@ Todos los endpoints protegidos requieren un token JWT en el header de autorizaci
 Authorization: Bearer {tu_token_jwt}
 ```
 
-El token se obtiene al hacer login o registrarse.
+El token se obtiene al hacer login o registrarse y tiene la siguiente estructura:
+
+**Payload del Token:**
+```json
+{
+  "id": "user_id",
+  "email": "user@example.com",
+  "role": "Developer",
+  "isAdmin": false,
+  "iat": 1234567890,
+  "exp": 1234654290
+}
+```
+
+**Tiempo de Expiración:** 24 horas
 
 ---
 
 ## 👤 Roles de Usuario
 
-### Developer (Usuario Regular)
+El sistema implementa un control de acceso basado en roles (RBAC):
 
-- Puede registrarse y hacer login
-- Puede ver su propia información
-- **NO** puede actualizar sus propios datos
-- **NO** puede eliminar su propia cuenta
-- **NO** puede acceder a información de otros usuarios
-- **NO** puede cambiar roles
+### 🟢 Developer (Desarrollador)
 
-### Admin (Administrador)
+**Permisos:**
+- ✅ Registrarse y hacer login
+- ✅ Ver su propia información de perfil
+- ✅ Actualizar su perfil (nombre, email, avatar)
+- ✅ Cambiar su contraseña
+- ✅ Ver sprints asignados
+- ✅ Registrar puntos completados en sus sprints
+- ✅ Ver sus propias estadísticas y registros
 
-- Tiene todos los permisos de un usuario regular
-- Puede ver todos los usuarios del sistema
-- Puede ver información detallada de cualquier usuario
-- Puede actualizar roles de otros usuarios
-- Puede eliminar cualquier usuario
-- Tiene acceso completo a todos los recursos
+**Restricciones:**
+- ❌ No puede ver información de otros usuarios
+- ❌ No puede crear, editar o eliminar sprints
+- ❌ No puede modificar roles de usuarios
+- ❌ No puede acceder al panel de administración
+
+### 🔴 Admin (Administrador)
+
+**Permisos:** Control total del sistema
+- ✅ Todos los permisos de Scrum Master
+- ✅ **Ver todos los usuarios del sistema**
+- ✅ **Crear, editar y eliminar usuarios**
+- ✅ **Modificar roles de cualquier usuario**
+- ✅ **Eliminar sprints**
+- ✅ Acceso completo a todos los endpoints
+- ✅ Gestión completa de configuración del sistema
+
+---
+
+## 🔒 Códigos de Estado HTTP
+
+| Código | Significado | Descripción |
+|--------|-------------|-------------|
+| 200 | OK | Petición exitosa |
+| 201 | Created | Recurso creado exitosamente |
+| 400 | Bad Request | Datos inválidos o faltantes |
+| 401 | Unauthorized | Token inválido o expirado |
+| 403 | Forbidden | Sin permisos para realizar la acción |
+| 404 | Not Found | Recurso no encontrado |
+| 409 | Conflict | Conflicto (ej: email duplicado) |
+| 500 | Internal Server Error | Error del servidor |
+
+---
+
+## 🧪 Testing
+
+El proyecto incluye tests unitarios para validar el funcionamiento de los modelos y controladores. Los tests están implementados con **Jest** y **MongoDB Memory Server** para pruebas aisladas.
+
+### Ejecutar Tests
+
+```bash
+# Ejecutar todos los tests
+npm test
+
+# Ejecutar tests en modo watch
+npm run test:watch
+
+# Ver cobertura de tests
+npm run test:coverage
+```
+
+### Ejemplo de Tests
+
+Los tests cubren los modelos principales del sistema (User, Sprint, etc.) y validan:
+- ✅ Creación de registros
+- ✅ Validaciones de campos
+- ✅ Operaciones CRUD
+- ✅ Reglas de negocio
+- ✅ Relaciones entre modelos
+
+![Tests del Backend](./public/testback.png)
+
+> 📄 Para más información sobre los tests, consulta el archivo [SECURITY_CHECKLIST.md](./SECURITY_CHECKLIST.md)
+
+---
+
+## 🔧 Variables de Entorno
+
+Configuración requerida en archivo `.env`:
+
+| Variable | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `PORT` | Puerto del servidor | `4000` |
+| `MONGO_URI` | URI de MongoDB | `mongodb://localhost:27017/sprintflow` |
+| `JWT_SECRET` | Clave secreta para JWT | 
+| `NODE_ENV` | Entorno de ejecución | `development` o `production` |
+| `CLIENT_URL` | URL del cliente | `http://localhost:5173` |
+
+---
+
+## 🚀 Despliegue
+
+### Desarrollo
+```bash
+npm run dev
+```
+
+### Producción
+```bash
+npm start
+```
+
+---
+
+## 🤝 Contribución
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+---
+
+## 📝 Notas Importantes
+
+- **Seguridad**: Las contraseñas se hashean con bcrypt antes de almacenarse
+- **CORS**: Configurado para aceptar peticiones del cliente en puerto 5173
+- **Validaciones**: Todos los endpoints validan los datos de entrada
+- **Tokens**: Los JWT expiran después de 24 horas
+- **Base de Datos**: MongoDB con Mongoose para modelado de datos
+- **Middleware**: Sistema de autenticación y autorización por roles
+
+---
+
+## 📧 Contacto
+
+Para dudas o sugerencias sobre el backend de SprintFlow, contacta al equipo de desarrollo.
+
+---
+
+## 📄 Licencia
+
+Este proyecto es privado y pertenece al equipo SprintFlow.
 
 ---
