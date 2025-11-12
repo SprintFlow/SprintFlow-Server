@@ -7,7 +7,7 @@
     "dev": "cross-env NODE_ENV=development nodemon index.js",
     "start": "cross-env NODE_ENV=production node index.js",
     "pretest": "echo '\n🛡️  INICIANDO TESTS EN MODO SEGURO (MongoDB en memoria)' && echo '✅ Tu base de datos de Atlas NO será tocada\n'",
-    "test": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --verbose --runInBand",
+    "test": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose --silent --runInBand",
     "test:watch": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --watch --runInBand",
     "test:safe": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js src/test/verify-safety.test.js src/test/validation.test.js --runInBand",
     "test:auth": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js src/test/auth.test.js --runInBand",
