@@ -4,36 +4,126 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
+    "pretest": "echo '\n🛡️  INICIANDO TESTS EN MODO SEGURO (MongoDB en memoria)' && echo '✅ Tu base de datos de Atlas NO será tocada\n'",
+    "test": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --verbose --runInBand",
+    "test:watch": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --watch --runInBand",
+    "test:safe": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js src/test/verify-safety.test.js src/test/validation.test.js --runInBand",
+    "test:auth": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js src/test/auth.test.js --runInBand",
+    "test:validation": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js src/test/validation.test.js --runInBand",
+    "test:basic": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js src/test/verify-safety.test.js src/test/validation.test.js src/test/auth.test.js --runInBand",
+    "test:ci": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --ci --coverage --maxWorkers=2 --runInBand",
+    "test:coverage": "npm test && start coverage/index.html",
+    "test:quick": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --bail --no-coverage",
+    "clean": "rm -rf coverage node_modules/.cache .mongoMemory",
+    "postinstall": "echo '✅ SprintFlow Server instalado correctamente'"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SprintFlow/SprintFlow-Server.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "sprintflow",
+    "scrum",
+    "agile",
+    "sprint-management",
+    "api",
+    "nodejs",
+    "express",
+    "mongodb",
+    "jest",
+    "testing",
+    "rest-api"
+  ],
+  "author": "SprintFlow Team",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/SprintFlow/SprintFlow-Server/issues"
   },
   "homepage": "https://github.com/SprintFlow/SprintFlow-Server#readme",
-  "description": "",
+  "description": "Backend API for SprintFlow - Professional Sprint Management System with comprehensive testing suite",
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.20.0",
-    "mongodb-memory-server": "^10.3.0",
     "mongoose": "^8.19.2",
-    "sequelize": "^6.37.7"
+    "morgan": "^1.10.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@types/jest": "^30.0.0",
+    "babel-jest": "^30.2.0",
+    "cross-env": "^7.0.3",
     "jest": "^30.2.0",
+    "mongodb-memory-server": "^8.16.0",
     "nodemon": "^3.1.10",
     "supertest": "^7.1.4",
     "typescript": "^5.9.3"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {},
+    "testMatch": [
+      "**/src/test/**/*.test.js",
+      "!**/src/test/setup.test.js"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/coverage/"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/test/setup.test.js"
+    ],
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/test/**",
+      "!src/**/*.test.js",
+      "!src/config/**",
+      "!index.js"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 14,
+        "functions": 9,
+        "lines": 24,
+        "statements": 23
+      }
+    },
+    "coverageReporters": [
+      "text",
+      "text-summary",
+      "html",
+      "lcov"
+    ],
+    "testTimeout": 30000,
+    "verbose": true,
+    "bail": false,
+    "clearMocks": true,
+    "resetMocks": true,
+    "restoreMocks": true,
+    "maxWorkers": 1,
+    "detectOpenHandles": true,
+    "forceExit": true
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "*.test.js",
+      "coverage/*",
+      "node_modules/*",
+      ".mongoMemory/*"
+    ],
+    "delay": 500
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }
