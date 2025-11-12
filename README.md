@@ -243,7 +243,9 @@ El sistema implementa un control de acceso basado en roles (RBAC):
 
 ## 🧪 Testing
 
-El proyecto incluye tests unitarios usando Jest:
+El proyecto incluye tests unitarios para validar el funcionamiento de los modelos y controladores. Los tests están implementados con **Jest** y **MongoDB Memory Server** para pruebas aisladas.
+
+### Ejecutar Tests
 
 ```bash
 # Ejecutar todos los tests
@@ -255,6 +257,19 @@ npm run test:watch
 # Ver cobertura de tests
 npm run test:coverage
 ```
+
+### Ejemplo de Tests
+
+Los tests cubren los modelos principales del sistema (User, Sprint, etc.) y validan:
+- ✅ Creación de registros
+- ✅ Validaciones de campos
+- ✅ Operaciones CRUD
+- ✅ Reglas de negocio
+- ✅ Relaciones entre modelos
+
+![Tests del Backend](./public/testback.png)
+
+> 📄 Para más información sobre los tests, consulta el archivo [SECURITY_CHECKLIST.md](./SECURITY_CHECKLIST.md)
 
 ---
 
@@ -282,12 +297,6 @@ npm run dev
 ### Producción
 ```bash
 npm start
-```
-
-### Con Docker (opcional)
-```bash
-docker build -t sprintflow-server .
-docker run -p 4000:4000 sprintflow-server
 ```
 
 ---
