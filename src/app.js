@@ -10,15 +10,18 @@ import pointsRegistryRoutes from './routes/pointsRegistryRoutes.js';
 
 const app = express();
 
-// Middlewares
+// Middlewares básicos
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Logging middleware
-app.use((req, res, next) => {
-  console.log(`📍 ${req.method} ${req.path}`);
-  next();
-});
+// Logging middleware (solo en desarrollo, no en tests)
+if (process.env.NODE_ENV !== 'test') {
+  app.use((req, res, next) => {
+    console.log(`📍 ${req.method} ${req.path}`);
+    next();
+  });
+}
 
 // Rutas
 app.use('/api/auth', authRoutes);
@@ -28,14 +31,16 @@ app.use('/api/completions', completionRoutes);
 app.use('/api/stories', StoryRoutes);
 app.use('/api/points-registry', pointsRegistryRoutes);
 
-// Log de rutas registradas
-console.log('✅ Rutas registradas:');
-console.log('  - /api/auth');
-console.log('  - /api/users');
-console.log('  - /api/sprints');
-console.log('  - /api/completions');
-console.log('  - /api/stories');
-console.log('  - /api/points-registry');
+// Log de rutas registradas (solo en desarrollo)
+if (process.env.NODE_ENV !== 'test') {
+  console.log('✅ Rutas registradas:');
+  console.log('  - /api/auth');
+  console.log('  - /api/users');
+  console.log('  - /api/sprints');
+  console.log('  - /api/completions');
+  console.log('  - /api/stories');
+  console.log('  - /api/points-registry');
+}
 
 // Rutas de prueba / protegidas
 app.get('/api/private', protect, (req, res) => {
@@ -49,6 +54,25 @@ app.get('/api/admin', protect, admin, (req, res) => {
 // Health check
 app.get('/', (req, res) => {
   res.send('Servidor funcionando');
+});
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Manejo de rutas no encontradas
+app.use((req, res) => {
+  res.status(404).json({ error: 'Ruta no encontrada' });
+});
+
+// Manejo global de errores
+app.use((err, req, res, next) => {
+  if (process.env.NODE_ENV !== 'test') {
+    console.error('Error:', err);
+  }
+  res.status(err.status || 500).json({
+    error: err.message || 'Error interno del servidor'
+  });
 });
 
 export default app;

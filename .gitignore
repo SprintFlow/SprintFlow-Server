@@ -1,2 +1,28 @@
-node_modules
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# MongoDB Memory Server
+.mongoMemory/
+mongod-*.log
+*.lock
+
+# Jest
+coverage/
+.jest-cache/
+
+# Variables de entorno
 .env
+.env.local
+.env.production
+
+# Mantener .env.test como referencia (sin credenciales reales)
+!.env.test
+
+# Node modules
+node_modules/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
