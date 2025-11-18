@@ -6,7 +6,7 @@ import sprintRoutes from './routes/sprintRoutes.js';
 import completionRoutes from './routes/CompletionRoutes.js';
 import StoryRoutes from './routes/StoryRoutes.js';
 import { protect, admin } from './middlewares/authMiddleware.js';
-import pointsRegistryRoutes from './routes/PointsRegistryRoutes.js'; 
+import pointsRegistryRoutes from './routes/pointsRegistryRoutes.js'; 
 
 const app = express();
 
