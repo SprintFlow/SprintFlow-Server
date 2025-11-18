@@ -10,15 +10,39 @@ import pointsRegistryRoutes from './routes/PointsRegistryRoutes.js';
 
 const app = express();
 
+// ✅ CONFIGURACIÓN CORS MEJORADA - Reemplaza la línea app.use(cors());
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:5173',  // Desarrollo
+      'https://sprint-flow-client-kqk8.vercel.app'  // Producción - tu frontend
+    ];
+    
+    // Permitir requests sin origin (como mobile apps, curl, postman)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('🚫 CORS bloqueado para origen:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+
+app.use(cors(corsOptions));
+
 // Middlewares básicos
-app.use(cors());
 app.use(express.json({ limit: '10mb' })); // Aumentar límite para imágenes Base64
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Logging middleware (solo en desarrollo, no en tests)
 if (process.env.NODE_ENV !== 'test') {
   app.use((req, res, next) => {
-    console.log(`📍 ${req.method} ${req.path}`);
+    console.log(`📍 ${req.method} ${req.path} - Origin: ${req.headers.origin}`);
     next();
   });
 }
@@ -40,6 +64,7 @@ if (process.env.NODE_ENV !== 'test') {
   console.log('  - /api/completions');
   console.log('  - /api/stories');
   console.log('  - /api/points-registry');
+  console.log('🌐 CORS configurado para:', corsOptions.origin);
 }
 
 // Rutas de prueba / protegidas
@@ -57,7 +82,12 @@ app.get('/', (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+    allowedOrigins: corsOptions.origin
+  });
 });
 
 // Manejo de rutas no encontradas
@@ -70,6 +100,15 @@ app.use((err, req, res, next) => {
   if (process.env.NODE_ENV !== 'test') {
     console.error('Error:', err);
   }
+  
+  // Manejar errores de CORS específicamente
+  if (err.message === 'Not allowed by CORS') {
+    return res.status(403).json({
+      error: 'Origen no permitido por CORS',
+      allowedOrigins: corsOptions.origin
+    });
+  }
+  
   res.status(err.status || 500).json({
     error: err.message || 'Error interno del servidor'
   });
